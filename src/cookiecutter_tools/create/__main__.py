@@ -5,6 +5,7 @@ from typing import Tuple
 
 import click
 from cookiecutter import cli
+from cookiecutter.log import configure_logger
 
 from .create import create
 
@@ -30,6 +31,7 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
 @click.version_option()
 def main(template: str, extra_context: Tuple[str, ...]) -> None:
     """Create a project from a Cookiecutter template."""
+    configure_logger(stream_level="INFO")
     create(template, extra_context)
 
 
