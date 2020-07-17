@@ -110,7 +110,7 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
     default=None,
     help="File to be used as a stream for DEBUG logging",
 )
-@click.version_option()
+@click.version_option(None, "-V", "--version")
 def main(
     template: str,
     extra_context: Tuple[str, ...],
