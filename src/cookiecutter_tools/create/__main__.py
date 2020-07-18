@@ -4,6 +4,7 @@ import sys
 from textwrap import dedent
 from typing import Any
 from typing import cast
+from typing import Optional
 from typing import Tuple
 
 import click
@@ -56,13 +57,21 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
     is_flag=True,
     help="Do not prompt for parameters and only use cookiecutter.json file content",
 )
+@click.option(
+    "-c", "--checkout", help="branch, tag or commit to checkout after git clone"
+)
 @click.version_option()
-def main(template: str, extra_context: Tuple[str, ...], no_input: bool) -> None:
+def main(
+    template: str,
+    extra_context: Tuple[str, ...],
+    no_input: bool,
+    checkout: Optional[str],
+) -> None:
     """Create a project from a Cookiecutter template."""
     configure_logger(stream_level="INFO")
 
     try:
-        create(template, extra_context, no_input=no_input)
+        create(template, extra_context, no_input=no_input, checkout=checkout)
     except errors as error:
         sys.exit(str(error))
     except exceptions.UndefinedVariableInTemplate as error:
