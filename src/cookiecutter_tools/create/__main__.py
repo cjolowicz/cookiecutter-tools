@@ -70,6 +70,9 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
 @click.option(
     "-v", "--verbose", is_flag=True, help="Print debug information", default=False
 )
+@click.option(
+    "--config-file", type=click.Path(), default=None, help="User configuration file"
+)
 @click.version_option()
 def main(
     template: str,
@@ -78,6 +81,7 @@ def main(
     checkout: Optional[str],
     directory: Optional[str],
     verbose: bool,
+    config_file: Optional[str],
 ) -> None:
     """Create a project from a Cookiecutter template."""
     configure_logger(stream_level="DEBUG" if verbose else "INFO")
@@ -89,6 +93,7 @@ def main(
             no_input=no_input,
             checkout=checkout,
             directory=directory,
+            config_file=config_file,
         )
     except errors as error:
         sys.exit(str(error))
