@@ -1,5 +1,6 @@
 """Command-line interface."""
 import json
+import sys
 from textwrap import dedent
 from typing import Any
 from typing import cast
@@ -58,10 +59,10 @@ def main(template: str, extra_context: Tuple[str, ...]) -> None:
     try:
         create(template, extra_context)
     except errors as error:
-        raise click.ClickException(str(error))
+        sys.exit(str(error))
     except exceptions.UndefinedVariableInTemplate as error:
         message = format_undefined_variable_error(error)
-        raise click.ClickException(message)
+        sys.exit(message)
 
 
 if __name__ == "__main__":
