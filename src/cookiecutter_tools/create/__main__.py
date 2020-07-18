@@ -51,13 +51,18 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
 @click.argument("template")
 @click.argument("extra_context", nargs=-1, callback=validate_extra_context)
+@click.option(
+    "--no-input",
+    is_flag=True,
+    help="Do not prompt for parameters and only use cookiecutter.json file content",
+)
 @click.version_option()
-def main(template: str, extra_context: Tuple[str, ...]) -> None:
+def main(template: str, extra_context: Tuple[str, ...], no_input: bool) -> None:
     """Create a project from a Cookiecutter template."""
     configure_logger(stream_level="INFO")
 
     try:
-        create(template, extra_context)
+        create(template, extra_context, no_input=no_input)
     except errors as error:
         sys.exit(str(error))
     except exceptions.UndefinedVariableInTemplate as error:
