@@ -3,9 +3,10 @@ from __future__ import annotations
 
 import contextlib
 from dataclasses import dataclass
-from typing import Iterator
+from typing import Iterable
 from typing import Optional
 
+from packaging.specifiers import SpecifierSet
 from packaging.version import InvalidVersion
 from packaging.version import Version
 
@@ -26,16 +27,28 @@ class VersionTag:
         return cls(name, version)
 
 
-def load(repository: git.Repository) -> Iterator[VersionTag]:
+def load(repository: git.Repository) -> Iterable[VersionTag]:
     """Load versions tagged in the repository."""
     for tag in repository.tags():
         with contextlib.suppress(InvalidVersion):
             yield VersionTag.create(tag)
 
 
-def find_latest(repository: git.Repository) -> Optional[str]:
+def filter(tags: Iterable[VersionTag], specifier: str) -> Iterable[VersionTag]:
+    """Return only the version tags that satisfy the given specifier."""
+    mapping = {tag.version: tag for tag in tags}
+    versions = SpecifierSet(specifier).filter(mapping.keys())
+    return [mapping[version] for version in versions]
+
+
+def find_latest(
+    repository: git.Repository, *, specifier: Optional[str] = None
+) -> Optional[str]:
     """Return the Git tag for the latest version."""
     tags = list(load(repository))
+
+    if tags and specifier is not None:
+        tags = filter(tags, specifier)
 
     if tags:
         latest = max(tags, key=lambda tag: tag.version)
