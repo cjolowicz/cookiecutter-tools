@@ -25,9 +25,17 @@ logger = logging.getLogger(__name__)
 StrMapping = Mapping[str, Any]
 
 
-def _determine_revision(repository: git.Repository) -> str:
-    tag = tags.find_latest(repository)
-    return tag if tag is not None else "HEAD"
+def _determine_revision(
+    repository: git.Repository, *, requirement: Optional[str]
+) -> str:
+    tag = tags.find_latest(repository, requirement=requirement)
+    if tag is not None:
+        return tag
+
+    if requirement is not None:
+        raise Exception(f"No version found for {requirement!r}")
+
+    return "HEAD"
 
 
 def _create_context(
@@ -56,6 +64,7 @@ def create(
     extra_context: Tuple[str, ...],
     *,
     no_input: bool,
+    require: Optional[str],
     checkout: Optional[str],
     directory: Optional[str],
     replay: bool,
@@ -66,6 +75,11 @@ def create(
     default_config: bool,
 ) -> None:
     """Create a project from a Cookiecutter template."""
+    if require and checkout:
+        raise exceptions.InvalidModeException(
+            "You can not use both require and checkout at the same time."
+        )
+
     if replay and (no_input or extra_context):
         raise exceptions.InvalidModeException(
             "You can not use both replay and no_input or extra_context "
@@ -77,8 +91,12 @@ def create(
         template=template, abbreviations=config["abbreviations"]
     )
     repository = cache.repository(template)
-    ref = checkout if checkout is not None else _determine_revision(repository)
-    with cache.worktree(template, ref) as worktree:
+    revision = (
+        checkout
+        if checkout is not None
+        else _determine_revision(repository, requirement=require)
+    )
+    with cache.worktree(template, revision) as worktree:
         repo_dir = (
             worktree.path if directory is None else worktree.path / Path(directory)
         )

@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Iterable
 from typing import Optional
 
+from packaging.specifiers import InvalidSpecifier
 from packaging.specifiers import SpecifierSet
 from packaging.version import InvalidVersion
 from packaging.version import Version
@@ -34,21 +35,27 @@ def load(repository: git.Repository) -> Iterable[VersionTag]:
             yield VersionTag.create(tag)
 
 
-def filter(tags: Iterable[VersionTag], specifier: str) -> Iterable[VersionTag]:
+def _to_specifier_set(requirement: str) -> SpecifierSet:
+    with contextlib.suppress(InvalidSpecifier):
+        return SpecifierSet(requirement)
+    return SpecifierSet(f"=={requirement}")
+
+
+def filter(tags: Iterable[VersionTag], requirement: str) -> Iterable[VersionTag]:
     """Return only the version tags that satisfy the given specifier."""
     mapping = {tag.version: tag for tag in tags}
-    versions = SpecifierSet(specifier).filter(mapping.keys())
+    versions = _to_specifier_set(requirement).filter(mapping.keys())
     return [mapping[version] for version in versions if isinstance(version, Version)]
 
 
 def find_latest(
-    repository: git.Repository, *, specifier: Optional[str] = None
+    repository: git.Repository, *, requirement: Optional[str] = None
 ) -> Optional[str]:
     """Return the Git tag for the latest version."""
     tags: Iterable[VersionTag] = list(load(repository))
 
-    if tags and specifier is not None:
-        tags = filter(tags, specifier)
+    if tags and requirement is not None:
+        tags = filter(tags, requirement)
 
     if tags:
         latest = max(tags, key=lambda tag: tag.version)

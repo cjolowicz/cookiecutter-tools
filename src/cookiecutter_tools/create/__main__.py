@@ -69,6 +69,14 @@ def validate_extra_context(*args: Any) -> Tuple[str, ...]:
     help="Do not prompt for parameters and only use cookiecutter.json file content",
 )
 @click.option(
+    "-r",
+    "--require",
+    help=(
+        "A version or version constraint for the template. By default, the latest "
+        "version is retrieved. If no versions are tagged, HEAD is retrieved."
+    ),
+)
+@click.option(
     "-c", "--checkout", help="branch, tag or commit to checkout after git clone"
 )
 @click.option(
@@ -125,6 +133,7 @@ def main(
     template: str,
     extra_context: Tuple[str, ...],
     no_input: bool,
+    require: Optional[str],
     checkout: Optional[str],
     directory: Optional[str],
     verbose: bool,
@@ -144,6 +153,7 @@ def main(
             template,
             extra_context,
             no_input=no_input,
+            require=require,
             checkout=checkout,
             directory=directory,
             replay=replay,
