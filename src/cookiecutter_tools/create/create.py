@@ -1,6 +1,7 @@
 """Create a project."""
 import logging
 from pathlib import Path
+from textwrap import dedent
 from typing import Any
 from typing import cast
 from typing import Mapping
@@ -51,6 +52,25 @@ def _create_context(
     return cast(StrMapping, context)
 
 
+def _create_repository(project: Path, template: str, revision: str) -> None:
+    message = f"""\
+    Initial project structure
+
+    This project structure was generated from a project template:
+
+    - Template: {template}
+    - Revision: {revision}
+    """
+    repository = (
+        git.Repository(project)
+        if (project / ".git").is_dir()
+        else git.Repository.init(project)
+    )
+    repository.git("add", ".")
+    repository.git("commit", f"--message={dedent(message)}")
+    repository.git("branch", "cookiecutter")
+
+
 def create(
     template: str,
     extra_context: Tuple[str, ...],
@@ -99,10 +119,12 @@ def create(
             )
             dump(config["replay_dir"], repo_hash, context)
 
-        generate_files(
+        project = generate_files(
             repo_dir=str(repo_dir),
             context=context,
             overwrite_if_exists=overwrite_if_exists,
             skip_if_file_exists=skip_if_file_exists,
             output_dir=output_dir,
         )
+
+    _create_repository(Path(project), template, revision)
