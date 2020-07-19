@@ -38,14 +38,14 @@ def filter(tags: Iterable[VersionTag], specifier: str) -> Iterable[VersionTag]:
     """Return only the version tags that satisfy the given specifier."""
     mapping = {tag.version: tag for tag in tags}
     versions = SpecifierSet(specifier).filter(mapping.keys())
-    return [mapping[version] for version in versions]
+    return [mapping[version] for version in versions if isinstance(version, Version)]
 
 
 def find_latest(
     repository: git.Repository, *, specifier: Optional[str] = None
 ) -> Optional[str]:
     """Return the Git tag for the latest version."""
-    tags = list(load(repository))
+    tags: Iterable[VersionTag] = list(load(repository))
 
     if tags and specifier is not None:
         tags = filter(tags, specifier)
