@@ -135,7 +135,7 @@ class Repository:
     @contextlib.contextmanager
     def worktree(
         self, path: Path, ref: str, *, detach: bool = False, force_remove: bool = False
-    ) -> Iterator[git.Repository]:
+    ) -> Iterator[Repository]:
         """Context manager to add and remove a worktree."""
         worktree = self.add_worktree(path, ref, detach=detach)
 
