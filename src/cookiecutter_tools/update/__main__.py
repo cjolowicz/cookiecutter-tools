@@ -31,6 +31,9 @@ from .core import update
 @click.option(
     "-v", "--verbose", is_flag=True, help="Print debug information", default=False
 )
+@click.option(
+    "--config-file", type=click.Path(), default=None, help="User configuration file"
+)
 @click.version_option(None, "-V", "--version")
 def main(
     extra_context: StrMapping,
@@ -38,11 +41,16 @@ def main(
     checkout: Optional[str],
     directory: Optional[str],
     verbose: bool,
+    config_file: Optional[str],
 ) -> None:
     """Update a project from a Cookiecutter template."""
     configure_logger(stream_level="DEBUG" if verbose else "INFO")
     update(
-        extra_context, interactive=interactive, checkout=checkout, directory=directory
+        extra_context,
+        interactive=interactive,
+        checkout=checkout,
+        directory=directory,
+        config_file=config_file,
     )
 
 
