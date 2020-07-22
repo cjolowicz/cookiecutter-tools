@@ -20,12 +20,24 @@ from .core import update
 @click.option(
     "-c", "--checkout", help="branch, tag or commit to checkout after git clone"
 )
+@click.option(
+    "--directory",
+    help=(
+        "Directory within repo that holds cookiecutter.json file "
+        "for advanced repositories with multi templates in it"
+    ),
+)
 @click.version_option(None, "-V", "--version")
 def main(
-    extra_context: StrMapping, interactive: bool, checkout: Optional[str],
+    extra_context: StrMapping,
+    interactive: bool,
+    checkout: Optional[str],
+    directory: Optional[str],
 ) -> None:
     """Update a project from a Cookiecutter template."""
-    update(extra_context, interactive=interactive, checkout=checkout)
+    update(
+        extra_context, interactive=interactive, checkout=checkout, directory=directory
+    )
 
 
 if __name__ == "__main__":
