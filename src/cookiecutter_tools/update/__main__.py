@@ -1,4 +1,6 @@
 """Command-line interface."""
+from typing import Optional
+
 import click
 
 from ..create.__main__ import validate_extra_context
@@ -15,10 +17,15 @@ from .core import update
     help="Prompt for parameters",
     show_default=True,
 )
+@click.option(
+    "-c", "--checkout", help="branch, tag or commit to checkout after git clone"
+)
 @click.version_option(None, "-V", "--version")
-def main(extra_context: StrMapping, interactive: bool) -> None:
+def main(
+    extra_context: StrMapping, interactive: bool, checkout: Optional[str],
+) -> None:
     """Update a project from a Cookiecutter template."""
-    update(extra_context, interactive=interactive)
+    update(extra_context, interactive=interactive, checkout=checkout)
 
 
 if __name__ == "__main__":
