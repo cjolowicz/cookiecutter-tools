@@ -34,6 +34,11 @@ from .core import update
 @click.option(
     "--config-file", type=click.Path(), default=None, help="User configuration file"
 )
+@click.option(
+    "--default-config",
+    is_flag=True,
+    help="Do not load a config file. Use the defaults instead",
+)
 @click.version_option(None, "-V", "--version")
 def main(
     extra_context: StrMapping,
@@ -42,6 +47,7 @@ def main(
     directory: Optional[str],
     verbose: bool,
     config_file: Optional[str],
+    default_config: bool,
 ) -> None:
     """Update a project from a Cookiecutter template."""
     configure_logger(stream_level="DEBUG" if verbose else "INFO")
@@ -51,6 +57,7 @@ def main(
         checkout=checkout,
         directory=directory,
         config_file=config_file,
+        default_config=default_config,
     )
 
 
