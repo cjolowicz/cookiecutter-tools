@@ -2,21 +2,12 @@
 import shutil
 from pathlib import Path
 from textwrap import dedent
-from typing import Iterator
 
 import pytest
 from click.testing import CliRunner
 
 from cookiecutter_tools import git
 from cookiecutter_tools.create import __main__
-
-
-@pytest.fixture
-def runner() -> Iterator[CliRunner]:
-    """Fixture for invoking command-line interfaces."""
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-        yield runner
 
 
 def test_main_succeeds(runner: CliRunner) -> None:
